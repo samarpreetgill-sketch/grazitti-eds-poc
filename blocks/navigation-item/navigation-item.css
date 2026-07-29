@@ -1,0 +1,19 @@
+/* Authoring-preview styling only — this block is never rendered as-is on
+   the live site. header.js reads the authored .navigation-item markup out
+   of the /nav fragment and rebuilds the real nav/mega-menu DOM from it. */
+.navigation-item {
+  position: relative;
+  padding: var(--space-sm);
+  border: 1px dashed var(--color-border);
+}
+
+.navigation-item::before {
+  content: attr(data-nav-type);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px var(--space-sm);
+  background-color: var(--color-bg-light);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}

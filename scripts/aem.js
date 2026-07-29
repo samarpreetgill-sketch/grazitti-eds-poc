@@ -16,24 +16,15 @@ function sampleRUM(checkpoint, data) {
   const timeShift = () => (window.performance ? window.performance.now() : Date.now() - window.hlx.rum.firstReadTime);
   try {
     window.hlx = window.hlx || {};
-    if (!window.hlx.rum || !window.hlx.rum.collector) {
+    if (!window.hlx.rum) {
       sampleRUM.enhance = () => {};
-      const params = new URLSearchParams(window.location.search);
-      const { currentScript } = document;
-      const rate = params.get('rum')
-        || window.SAMPLE_PAGEVIEWS_AT_RATE
-        || params.get('optel')
-        || (currentScript && currentScript.dataset.rate);
-      const rateValue = {
-        on: 1,
-        off: 0,
-        high: 10,
-        low: 1000,
-      }[rate];
-      const weight = rateValue !== undefined ? rateValue : 100;
-      const id = (window.hlx.rum && window.hlx.rum.id) || crypto.randomUUID().slice(-9);
-      const isSelected = (window.hlx.rum && window.hlx.rum.isSelected)
-        || (weight > 0 && Math.random() * weight < 1);
+      const param = new URLSearchParams(window.location.search).get('rum');
+      const weight = (param === 'on' && 1)
+        || (window.SAMPLE_PAGEVIEWS_AT_RATE === 'high' && 10)
+        || (window.SAMPLE_PAGEVIEWS_AT_RATE === 'low' && 1000)
+        || 100;
+      const id = Math.random().toString(36).slice(-4);
+      const isSelected = param !== 'off' && Math.random() * weight < 1;
       // eslint-disable-next-line object-curly-newline, max-len
       window.hlx.rum = {
         weight,
@@ -49,15 +40,13 @@ function sampleRUM(checkpoint, data) {
           const errData = { source: 'undefined error' };
           try {
             errData.target = error.toString();
-            if (error.stack) {
-              errData.source = error.stack
-                .split('\n')
-                .filter((line) => line.match(/https?:\/\//))
-                .shift()
-                .replace(/at ([^ ]+) \((.+)\)/, '$1@$2')
-                .replace(/ at /, '@')
-                .trim();
-            }
+            errData.source = error.stack
+              .split('\n')
+              .filter((line) => line.match(/https?:\/\//))
+              .shift()
+              .replace(/at ([^ ]+) \((.+)\)/, '$1@$2')
+              .replace(/ at /, '@')
+              .trim();
           } catch (err) {
             /* error structure was not as expected */
           }
@@ -80,37 +69,23 @@ function sampleRUM(checkpoint, data) {
           sampleRUM('error', errData);
         });
 
-        window.addEventListener('securitypolicyviolation', (e) => {
-          if (e.blockedURI.includes('helix-rum-enhancer') && e.disposition === 'enforce') {
-            const errData = {
-              source: 'csp',
-              target: e.blockedURI,
-            };
-            sampleRUM.sendPing('error', timeShift(), errData);
-          }
-        });
-
-        sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE || '/', new URL('https://ot.aem.live'));
+        sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE || '/', new URL('https://rum.hlx.page'));
         sampleRUM.collectBaseURL = sampleRUM.collectBaseURL || sampleRUM.baseURL;
         sampleRUM.sendPing = (ck, time, pingData = {}) => {
-          const uaExtra = navigator.webdriver && !navigator.userAgent.includes('+http')
-            ? { ua: `${navigator.userAgent} +http://navigator.webdriver` }
-            : {};
           // eslint-disable-next-line max-len, object-curly-newline
           const rumData = JSON.stringify({
             weight,
             id,
-            referer: window.location.origin + window.location.pathname,
+            referer: window.location.href,
             checkpoint: ck,
             t: time,
             ...pingData,
-            ...uaExtra,
           });
           const urlParams = window.RUM_PARAMS
-            ? new URLSearchParams(window.RUM_PARAMS).toString() || ''
+            ? `?${new URLSearchParams(window.RUM_PARAMS).toString()}`
             : '';
           const { href: url, origin } = new URL(
-            `.rum/${weight}${urlParams ? `?${urlParams}` : ''}`,
+            `.rum/${weight}${urlParams}`,
             sampleRUM.collectBaseURL,
           );
           const body = origin === window.location.origin
@@ -314,6 +289,16 @@ function getMetadata(name, doc = document) {
 }
 
 /**
+ * Returns the brand path for block/theme assets (e.g. 'abbvie/'). Used to load compiled block CSS
+ * from styles/<brand>/blocks/<blockName>/ (breakpoint tokens resolved to real media queries).
+ * @returns {string} Brand path with trailing slash, default 'abbvie/'
+ */
+function getBrandPath() {
+  const brand = getMetadata('brand')?.trim();
+  return brand ? `${brand}/` : 'abbvie/';
+}
+
+/**
  * Returns a picture element with webp and fallbacks
  * @param {string} src The image URL
  * @param {string} [alt] The image alternative text
@@ -327,20 +312,17 @@ function createOptimizedPicture(
   eager = false,
   breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
-  const url = !src.startsWith('http') ? new URL(src, window.location.href) : new URL(src);
+  const url = new URL(src, window.location.href);
   const picture = document.createElement('picture');
-  const { origin, pathname } = url;
-  const ext = pathname.split('.').pop();
+  const { pathname } = url;
+  const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
   breakpoints.forEach((br) => {
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    source.setAttribute(
-      'srcset',
-      `${origin}${pathname}?width=${br.width}&format=webply&optimize=medium`,
-    );
+    source.setAttribute('srcset', `${pathname}?width=${br.width}&format=webply&optimize=medium`);
     picture.appendChild(source);
   });
 
@@ -349,20 +331,14 @@ function createOptimizedPicture(
     if (i < breakpoints.length - 1) {
       const source = document.createElement('source');
       if (br.media) source.setAttribute('media', br.media);
-      source.setAttribute(
-        'srcset',
-        `${origin}${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
-      );
+      source.setAttribute('srcset', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
       picture.appendChild(source);
     } else {
       const img = document.createElement('img');
       img.setAttribute('loading', eager ? 'eager' : 'lazy');
       img.setAttribute('alt', alt);
       picture.appendChild(img);
-      img.setAttribute(
-        'src',
-        `${origin}${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
-      );
+      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
     }
   });
 
@@ -402,7 +378,6 @@ function wrapTextNodes(block) {
     'H4',
     'H5',
     'H6',
-    'HR',
   ];
 
   const wrap = (el) => {
@@ -438,13 +413,50 @@ function wrapTextNodes(block) {
 }
 
 /**
+ * Decorates paragraphs containing a single link as buttons.
+ * @param {Element} element container element
+ */
+function decorateButtons(element) {
+  element.querySelectorAll('a').forEach((a) => {
+    a.title = a.title || a.textContent;
+    if (a.href !== a.textContent) {
+      const up = a.parentElement;
+      const twoup = a.parentElement.parentElement;
+      if (!a.querySelector('img')) {
+        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+          a.className = 'button'; // default
+          up.classList.add('button-container');
+        }
+        if (
+          up.childNodes.length === 1
+          && up.tagName === 'STRONG'
+          && twoup.childNodes.length === 1
+          && twoup.tagName === 'P'
+        ) {
+          a.className = 'button primary';
+          twoup.classList.add('button-container');
+        }
+        if (
+          up.childNodes.length === 1
+          && up.tagName === 'EM'
+          && twoup.childNodes.length === 1
+          && twoup.tagName === 'P'
+        ) {
+          a.className = 'button secondary';
+          twoup.classList.add('button-container');
+        }
+      }
+    }
+  });
+}
+
+/**
  * Add <img> for icon, prefixed with codeBasePath and optional prefix.
  * @param {Element} [span] span element with icon classes
  * @param {string} [prefix] prefix to be added to icon src
  * @param {string} [alt] alt text to be added to icon
  */
 function decorateIcon(span, prefix = '', alt = '') {
-  if (span.hasChildNodes()) return; // already decorated
   const iconName = Array.from(span.classList)
     .find((c) => c.startsWith('icon-'))
     .substring(5);
@@ -456,6 +468,10 @@ function decorateIcon(span, prefix = '', alt = '') {
   img.width = 16;
   img.height = 16;
   span.append(img);
+
+  document.querySelectorAll('img[data-icon-name]').forEach((imgEle) => {
+    imgEle.remove(); // or img.style.display = 'none'
+  });
 }
 
 /**
@@ -468,6 +484,43 @@ function decorateIcons(element, prefix = '') {
   icons.forEach((span) => {
     decorateIcon(span, prefix);
   });
+}
+
+function applySectionStyleValue(section, value) {
+  value
+    .split(',')
+    .map((style) => toClassName(style.trim()))
+    .filter(Boolean)
+    .forEach((style) => section.classList.add(style));
+}
+
+function applySectionMetaClasses(section, sectionMeta) {
+  [...sectionMeta.classList]
+    .filter((className) => className !== 'section-metadata')
+    .forEach((className) => {
+      section.classList.add(className);
+    });
+}
+
+function applySectionMeta(section, key, value) {
+  if (!value) return;
+
+  if (key === 'style') {
+    applySectionStyleValue(section, value);
+    return;
+  }
+
+  if (key === 'section-id' || key === 'sectionid') {
+    section.id = value;
+    return;
+  }
+
+  if (key.startsWith('classes-')) {
+    applySectionStyleValue(section, value);
+    return;
+  }
+
+  section.dataset[toCamelCase(key)] = value;
 }
 
 /**
@@ -489,23 +542,17 @@ function decorateSections(main) {
     });
     wrappers.forEach((wrapper) => section.append(wrapper));
     section.classList.add('section');
+    section.classList.add('grazitti-container');
     section.dataset.sectionStatus = 'initialized';
     section.style.display = 'none';
 
     // Process section metadata
     const sectionMeta = section.querySelector('div.section-metadata');
     if (sectionMeta) {
+      applySectionMetaClasses(section, sectionMeta);
       const meta = readBlockConfig(sectionMeta);
       Object.keys(meta).forEach((key) => {
-        if (key === 'style') {
-          const styles = meta.style
-            .split(',')
-            .filter((style) => style)
-            .map((style) => toClassName(style.trim()));
-          styles.forEach((style) => section.classList.add(style));
-        } else {
-          section.dataset[toCamelCase(key)] = meta[key];
-        }
+        applySectionMeta(section, key, meta[key]);
       });
       sectionMeta.parentNode.remove();
     }
@@ -552,8 +599,12 @@ async function loadBlock(block) {
   if (status !== 'loading' && status !== 'loaded') {
     block.dataset.blockStatus = 'loading';
     const { blockName } = block.dataset;
+    const brandPath = getBrandPath();
+    const baseCss = `${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`;
+    const brandCss = `${window.hlx.codeBasePath}/styles/${brandPath}blocks/${blockName}/${blockName}.css`;
     try {
-      const cssLoaded = loadCSS(`${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`);
+      // Load brand-compiled CSS first, fall back to base if brand css not found
+      const cssLoaded = loadCSS(brandCss).catch(() => loadCSS(baseCss));
       const decorationComplete = new Promise((resolve) => {
         (async () => {
           try {
@@ -565,7 +616,7 @@ async function loadBlock(block) {
             }
           } catch (error) {
             // eslint-disable-next-line no-console
-            console.error(`failed to load module for ${blockName}`, error);
+            console.log(`failed to load module for ${blockName}`, error);
           }
           resolve();
         })();
@@ -573,7 +624,7 @@ async function loadBlock(block) {
       await Promise.all([cssLoaded, decorationComplete]);
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`failed to load block ${blockName}`, error);
+      console.log(`failed to load block ${blockName}`, error);
     }
     block.dataset.blockStatus = 'loaded';
   }
@@ -595,6 +646,8 @@ function decorateBlock(block) {
     blockWrapper.classList.add(`${shortBlockName}-wrapper`);
     const section = block.closest('.section');
     if (section) section.classList.add(`${shortBlockName}-container`);
+    // eslint-disable-next-line no-use-before-define
+    decorateButtons(block);
   }
 }
 
@@ -603,7 +656,7 @@ function decorateBlock(block) {
  * @param {Element} main The container element
  */
 function decorateBlocks(main) {
-  main.querySelectorAll('div.section > div > div').forEach(decorateBlock);
+  main.querySelectorAll('div.section > div > div:not(.section)').forEach(decorateBlock);
 }
 
 /**
@@ -690,6 +743,7 @@ export {
   createOptimizedPicture,
   decorateBlock,
   decorateBlocks,
+  decorateButtons,
   decorateIcons,
   decorateSections,
   decorateTemplateAndTheme,

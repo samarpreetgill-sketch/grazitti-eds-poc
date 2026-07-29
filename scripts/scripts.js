@@ -10,6 +10,7 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
+import { addGridSectionsWrapper } from './utils.js';
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -155,6 +156,7 @@ async function loadLazy(doc) {
 
   const main = doc.querySelector('main');
   await loadSections(main);
+  addGridSectionsWrapper(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;

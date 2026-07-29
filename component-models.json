@@ -142,6 +142,128 @@
     ]
   },
   {
+    "id": "grid-section",
+    "fields": [
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Section Name",
+        "description": "The label shown for this section in the Content Tree"
+      },
+      {
+        "component": "multiselect",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Grid Section",
+            "value": "grid-section"
+          },
+          {
+            "name": "2 Columns",
+            "value": "grid-cols-2"
+          },
+          {
+            "name": "3 Columns",
+            "value": "grid-cols-3"
+          },
+          {
+            "name": "4 Columns",
+            "value": "grid-cols-4"
+          },
+          {
+            "name": "Split — 2/10 (first)",
+            "value": "grid-cols-2-first"
+          },
+          {
+            "name": "Split — 2/10 (second)",
+            "value": "grid-cols-10-second"
+          },
+          {
+            "name": "Split — 3/9 (first)",
+            "value": "grid-cols-3-first"
+          },
+          {
+            "name": "Split — 3/9 (second)",
+            "value": "grid-cols-9-second"
+          },
+          {
+            "name": "Split — 4/8 (first)",
+            "value": "grid-cols-4-first"
+          },
+          {
+            "name": "Split — 4/8 (second)",
+            "value": "grid-cols-8-second"
+          },
+          {
+            "name": "Split — 7/5 (first)",
+            "value": "grid-cols-7-first"
+          },
+          {
+            "name": "Split — 7/5 (second)",
+            "value": "grid-cols-5-second"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grid-container",
+    "fields": [
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Section Name",
+        "description": "The label shown for this section in the Content Tree"
+      },
+      {
+        "component": "multiselect",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Grid Container",
+            "value": "grid-container"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "accordion-item",
+    "fields": [
+      {
+        "component": "text",
+        "name": "summary",
+        "value": "",
+        "label": "Summary",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Default State",
+        "options": [
+          {
+            "name": "Closed",
+            "value": ""
+          },
+          {
+            "name": "Open by default",
+            "value": "defaultopen"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "card",
     "fields": [
       {
@@ -211,6 +333,151 @@
         "name": "text",
         "value": "",
         "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "navigation-item",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Type",
+        "value": "nav-item",
+        "options": [
+          {
+            "name": "Logo",
+            "value": "logo"
+          },
+          {
+            "name": "Nav Item",
+            "value": "nav-item"
+          },
+          {
+            "name": "CTA Button",
+            "value": "cta"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "name": "image",
+        "label": "Logo Image",
+        "condition": {
+          "in": [
+            {
+              "var": "classes"
+            },
+            [
+              "logo"
+            ]
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "imageAlt",
+        "label": "Alt Text",
+        "condition": {
+          "in": [
+            {
+              "var": "classes"
+            },
+            [
+              "logo"
+            ]
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Nav Label",
+        "condition": {
+          "in": [
+            {
+              "var": "classes"
+            },
+            [
+              "nav-item"
+            ]
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "linkText",
+        "label": "Button Text",
+        "condition": {
+          "in": [
+            {
+              "var": "classes"
+            },
+            [
+              "cta"
+            ]
+          ]
+        }
+      },
+      {
+        "component": "aem-content",
+        "name": "link",
+        "label": "Link",
+        "condition": {
+          "in": [
+            {
+              "var": "classes"
+            },
+            [
+              "logo",
+              "cta"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "nav-group",
+    "fields": [
+      {
+        "component": "text",
+        "name": "heading",
+        "label": "Group Heading"
+      }
+    ]
+  },
+  {
+    "id": "nav-link",
+    "fields": [
+      {
+        "component": "text",
+        "name": "linkText",
+        "label": "Link Text"
+      },
+      {
+        "component": "aem-content",
+        "name": "link",
+        "label": "Link"
+      }
+    ]
+  },
+  {
+    "id": "tabs-item",
+    "fields": [
+      {
+        "component": "text",
+        "name": "title",
+        "value": "",
+        "label": "Tab Title",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Content",
         "valueType": "string"
       }
     ]
