@@ -251,6 +251,19 @@ main > .section > div {
   padding: 0 var(--layout-gutter);
 }
 
+/* Section metadata variants */
+main .section.light,
+main .section.highlight {
+  background-color: var(--light-color);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.full-width > div {
+  max-width: 100%;
+  padding: 0;
+}
+
 /* Base grid — applied to every section by aem.js decorateSections().
    Plain content wrapper divs always span the full row so ordinary
    (non-grid) sections keep stacking normally; only .section children
@@ -282,17 +295,4 @@ main > .section:first-of-type {
   main > .section > div {
     padding: 0 30px;
   }
-}
-
-/* Section metadata variants */
-main .section.light,
-main .section.highlight {
-  background-color: var(--light-color);
-  margin: 0;
-  padding: 40px 0;
-}
-
-main .section.full-width > div {
-  max-width: 100%;
-  padding: 0;
 }

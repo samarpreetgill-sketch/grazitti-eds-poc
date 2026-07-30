@@ -6,10 +6,10 @@
 
 :root {
   /* ── EDS-standard variable names (used by styles.css & blocks) ─────── */
-  --background-color: #ffffff;
+  --background-color: #fff;
   --light-color: #f5f5f5;
-  --dark-color: #555555;
-  --text-color: #333333;
+  --dark-color: #555;
+  --text-color: #333;
   --link-color: #13a7ec;
   --link-hover-color: #f2971c;
 
@@ -29,7 +29,6 @@
   --heading-font-size-m: 24px;
   --heading-font-size-s: 20px;
   --heading-font-size-xs: 18px;
-
   --nav-height: 70px;
 
   /* ── Grazitti brand palette ──────────────────────────────────────────── */
@@ -43,17 +42,17 @@
   --color-btn-confirm: #9dc53c;    /* cookie consent "Got it!" button */
 
   /* Text */
-  --color-text-primary: #333333;
-  --color-text-secondary: #555555;
-  --color-text-muted: #777777;
-  --color-text-fine: #888888;
+  --color-text-primary: #333;
+  --color-text-secondary: #555;
+  --color-text-muted: #777;
+  --color-text-fine: #888;
   --color-text-placeholder: #a3a3a3;
-  --color-text-inverse: #ffffff;
+  --color-text-inverse: #fff;
   --color-text-footer: #bcc1c5;         /* footer links, copyright */
   --color-text-footer-heading: #d3d3d3; /* footer column headings */
 
   /* Backgrounds */
-  --color-bg-white: #ffffff;
+  --color-bg-white: #fff;
   --color-bg-light: #f5f5f5;    /* .bg-light-gray — alternate sections */
   --color-bg-alt: #ededed;      /* .bg-dark-gray — alternate sections */
   --color-bg-card: #f7f7f7;     /* card / tab backgrounds */
@@ -68,7 +67,7 @@
   --color-dark-hero-3: #10141d;    /* homepage dark section variant 3 */
 
   /* Borders */
-  --color-border: #dddddd;
+  --color-border: #ddd;
   --color-border-light: #e9ecef;
   --color-border-orange: #fcb735;  /* .orange-bar decorative underline strip */
   --color-border-primary: #13a7ec;
@@ -76,9 +75,9 @@
 
   /* Button tokens */
   --color-btn-blue-bg: #13a7ec;
-  --color-btn-blue-text: #ffffff;
+  --color-btn-blue-text: #fff;
   --color-btn-orange-bg: #fcb735;
-  --color-btn-orange-text: #ffffff;
+  --color-btn-orange-text: #fff;
 
   /* ── Type scale ───────────────────────────────────────────────────────── */
   --text-xs: 12px;
@@ -133,7 +132,7 @@
   /* ── Shadows ──────────────────────────────────────────────────────────── */
   --shadow-nav: 0 1px 3px #b1b1b1;
   --shadow-card: 0 2px 5px rgb(0 0 0 / 25%);
-  --shadow-card-sm: 0 2px 3px #999999;
+  --shadow-card-sm: 0 2px 3px #999;
   --shadow-card-lg: 0 2px 10px #b9b9b9;
 
   /* ── Z-index ──────────────────────────────────────────────────────────── */
