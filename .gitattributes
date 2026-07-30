@@ -1,0 +1,15 @@
+# Normalize all text files to LF line endings in the repository,
+# regardless of the checking-out OS's core.autocrlf setting.
+* text=auto eol=lf
+
+# Explicit binary types — never touched by line-ending normalization
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
