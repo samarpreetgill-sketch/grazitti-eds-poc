@@ -13,6 +13,40 @@
           }
         }
       }
+    },
+    {
+      "title": "Grid Section",
+      "id": "grid-section",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/section/v1/section",
+            "template": {
+              "model": "grid-section",
+              "filter": "grid-section",
+              "name": "Grid Section",
+              "identifier": "Grid Section"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Grid Container",
+      "id": "grid-container",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/section/v1/section",
+            "template": {
+              "model": "grid-container",
+              "filter": "grid-container",
+              "name": "Grid Container",
+              "identifier": "Grid Container"
+            }
+          }
+        }
+      }
     }
   ],
   "models": [
@@ -37,6 +71,94 @@
           ]
         }
       ]
+    },
+    {
+      "id": "grid-section",
+      "fields": [
+        {
+          "component": "text",
+          "name": "name",
+          "label": "Section Name",
+          "description": "The label shown for this section in the Content Tree"
+        },
+        {
+          "component": "multiselect",
+          "name": "style",
+          "label": "Style",
+          "options": [
+            {
+              "name": "Grid Section",
+              "value": "grid-section"
+            },
+            {
+              "name": "2 Columns",
+              "value": "grid-cols-2"
+            },
+            {
+              "name": "3 Columns",
+              "value": "grid-cols-3"
+            },
+            {
+              "name": "4 Columns",
+              "value": "grid-cols-4"
+            },
+            {
+              "name": "Split — 2/10 (first)",
+              "value": "grid-cols-2-first"
+            },
+            {
+              "name": "Split — 2/10 (second)",
+              "value": "grid-cols-10-second"
+            },
+            {
+              "name": "Split — 3/9 (first)",
+              "value": "grid-cols-3-first"
+            },
+            {
+              "name": "Split — 3/9 (second)",
+              "value": "grid-cols-9-second"
+            },
+            {
+              "name": "Split — 4/8 (first)",
+              "value": "grid-cols-4-first"
+            },
+            {
+              "name": "Split — 4/8 (second)",
+              "value": "grid-cols-8-second"
+            },
+            {
+              "name": "Split — 7/5 (first)",
+              "value": "grid-cols-7-first"
+            },
+            {
+              "name": "Split — 7/5 (second)",
+              "value": "grid-cols-5-second"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grid-container",
+      "fields": [
+        {
+          "component": "text",
+          "name": "name",
+          "label": "Section Name",
+          "description": "The label shown for this section in the Content Tree"
+        },
+        {
+          "component": "multiselect",
+          "name": "style",
+          "label": "Style",
+          "options": [
+            {
+              "name": "Grid Container",
+              "value": "grid-container"
+            }
+          ]
+        }
+      ]
     }
   ],
   "filters": [
@@ -50,8 +172,31 @@
         "hero",
         "cards",
         "columns",
-        "fragment"
+        "fragment",
+        "tabs",
+        "accordion",
+        "navigation-item"
       ]
+    },
+    {
+      "id": "grid-section",
+      "components": [
+        "text",
+        "image",
+        "button",
+        "title",
+        "hero",
+        "cards",
+        "columns",
+        "fragment",
+        "tabs",
+        "accordion",
+        "navigation-item"
+      ]
+    },
+    {
+      "id": "grid-container",
+      "components": []
     }
   ]
 }

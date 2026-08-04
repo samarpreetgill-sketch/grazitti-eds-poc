@@ -1,0 +1,71 @@
+/*
+ * Grid Container / Grid Section layout
+ *
+ * Authors add a "Grid Container" section at the page level, followed by
+ * consecutive "Grid Section" siblings set to grid-cols-2 / grid-cols-3 /
+ * grid-cols-4. scripts/utils.js:addGridSectionsWrapper() physically moves
+ * those grid-cols-* siblings to become real DOM children of the preceding
+ * grid-container at render time (skipped in UE edit mode, so authors always
+ * see/manage a flat list). These rules only take effect after that move —
+ * the child-combinator selectors below do nothing until the reparenting
+ * has run.
+ */
+
+/* Grid Container — outer wrapper */
+.section.grid-container {
+  margin-bottom: var(--space-2xl);
+  padding-inline: 0;
+  row-gap: var(--space-lg);
+}
+
+@media (width >= 992px) {
+  .section.grid-container {
+    max-width: var(--layout-max-width);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Reset the generic "main > .section > div" content-wrapper rule for
+   grid-cols-* sections once they've been reparented under grid-container —
+   their own inner default-content-wrapper div still gets that treatment,
+   but the section itself should size to its grid column, not to a fixed
+   1200px container. Also: mobile default is full width until a
+   grid-cols-* span rule below overrides it at >= 992px. */
+.section.grid-container > :where(.section) {
+  max-width: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  grid-column: 1 / -1;
+}
+
+/* Fixed column-count variants — matches Grazitti's actual
+   col-md-2 / col-md-3 / col-md-4 usage on the live site.
+   Spans are computed against the 12-column grid, which only exists
+   at >= 992px (styles.css gives grid-container 6 columns between
+   768–991px) — so these rules apply from 992px, not 768px, otherwise
+   a "2 columns" section would span the entire 6-column tablet grid
+   and render full-width instead of side-by-side. */
+@media (width >= 992px) {
+  .section.grid-container > :where(.section.grid-cols-2) { grid-column: span 6; }   /* 12 / 2 */
+  .section.grid-container > :where(.section.grid-cols-3) { grid-column: span 4; }   /* 12 / 3 */
+  .section.grid-container > :where(.section.grid-cols-4) { grid-column: span 3; }   /* 12 / 4 */
+
+  /* Asymmetric ratio pairs — author applies the "-first" variant to the
+     first Grid Section child and the "-second" variant to the next
+     sibling, both inside the same Grid Container. Matches the unequal
+     splits observed on the live site (Marketo Optimization Solutions,
+     AI Solutions, Support page): 3/9, 2/10, 4/8, 7/5. */
+  .section.grid-container > :where(.section.grid-cols-2-first)   { grid-column: span 2; }
+  .section.grid-container > :where(.section.grid-cols-10-second) { grid-column: span 10; }
+
+  .section.grid-container > :where(.section.grid-cols-3-first) { grid-column: span 3; }
+  .section.grid-container > :where(.section.grid-cols-9-second) { grid-column: span 9; }
+
+  .section.grid-container > :where(.section.grid-cols-4-first) { grid-column: span 4; }
+  .section.grid-container > :where(.section.grid-cols-8-second) { grid-column: span 8; }
+
+  .section.grid-container > :where(.section.grid-cols-7-first) { grid-column: span 7; }
+  .section.grid-container > :where(.section.grid-cols-5-second) { grid-column: span 5; }
+}
