@@ -21,6 +21,24 @@
           "name": "keywords",
           "multi": true,
           "label": "Keywords"
+        },
+         {
+          "component": "text",
+          "valueType": "string",
+          "name": "nav",
+          "label": "Nav path"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "footer",
+          "label": "Footer path"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "template",
+          "label": "Template"
         }
       ]
     }
